@@ -9,7 +9,7 @@ class IrAttachment(models.Model):
 
     def init(self):
         if self.env.registry.has_trigram:
-            indexed_field = SQL('UNACCENT(index_content)') if self.env.registry.has_unaccent else SQL('index_content')
+            #indexed_field = SQL('UNACCENT(index_content)') if self.env.registry.has_unaccent else SQL('index_content')
 
             self.env.cr.execute(SQL('''
                 CREATE INDEX IF NOT EXISTS ir_attachment_index_content_applicant_trgm_idx
