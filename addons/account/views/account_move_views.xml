@@ -157,7 +157,7 @@
             <field name="model">account.move.line</field>
             <field eval="10" name="priority"/>
             <field name="arch" type="xml">
-                <list name="move_line_tree" string="Journal Items" decoration-info="parent_state == 'draft'" create="false" edit="true" expand="context.get('expand', False)" multi_edit="1" sample="1">
+                <list name="move_line_tree" string="Journal Items" decoration-info="parent_state == 'draft'" create="false" edit="true" expand="context.get('expand', False)" multi_edit="1">
                     <field name="move_id" column_invisible="True"/>
                     <field name="invoice_date" string="Invoice Date" optional="hide"/>
                     <field name="date" readonly="1"/>
@@ -1035,7 +1035,7 @@
                                        invisible="move_type not in ('in_invoice', 'in_refund', 'in_receipt')"/>
                                 <field name="invoice_date" nolabel="1" options="{'warn_future': true}"
                                        invisible="move_type not in ('in_invoice', 'in_refund', 'in_receipt')"
-                                       readonly="state != 'draft'" placeholder="Today"/>
+                                       readonly="state != 'draft'"/>
 
                                 <field name="date" string="Accounting Date"
                                        invisible="move_type in ('out_invoice', 'out_refund', 'out_receipt') and not quick_edit_mode and not (state == 'posted' and date != invoice_date)"
