@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-07 18:36+0000\n"
-"PO-Revision-Date: 2025-11-12 05:40+0000\n"
+"POT-Creation-Date: 2025-12-05 18:36+0000\n"
+"PO-Revision-Date: 2025-12-20 09:52+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
 "html_editor/ja/>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 5.14.3\n"
 
 #. module: html_editor
 #. odoo-javascript
@@ -418,9 +418,9 @@ msgstr "コード"
 
 #. module: html_editor
 #. odoo-javascript
-#: code:addons/html_editor/static/src/others/embedded_components/plugins/syntax_highlighting_plugin/code_toolbar.xml:0
+#: code:addons/html_editor/static/src/others/embedded_components/backend/syntax_highlighting/code_toolbar.xml:0
 msgid "Code copied to the clipboard."
-msgstr ""
+msgstr "コードがクリップボードにコピーされました。"
 
 #. module: html_editor
 #. odoo-javascript
@@ -466,15 +466,9 @@ msgstr "列に変換"
 
 #. module: html_editor
 #. odoo-javascript
-#: code:addons/html_editor/static/src/others/embedded_components/plugins/syntax_highlighting_plugin/code_toolbar.xml:0
+#: code:addons/html_editor/static/src/others/embedded_components/backend/syntax_highlighting/code_toolbar.xml:0
 msgid "Copy"
 msgstr "コピー"
-
-#. module: html_editor
-#. odoo-javascript
-#: code:addons/html_editor/static/src/main/link/link_popover.xml:0
-msgid "Copy Link"
-msgstr "リンクをコピー"
 
 #. module: html_editor
 #. odoo-javascript
@@ -616,6 +610,7 @@ msgstr "エラー: メディアライブラリーからURLをダウンロード�
 #. module: html_editor
 #. odoo-javascript
 #: code:addons/html_editor/static/src/fields/x2many_field/x2many_image_field.xml:0
+#: code:addons/html_editor/static/src/main/link/link_popover.xml:0
 msgid "Edit"
 msgstr "編集"
 
@@ -882,12 +877,12 @@ msgstr "HTML"
 #. module: html_editor
 #: model:ir.model,name:html_editor.model_html_editor_converter_test_sub
 msgid "Html Editor Converter Subtest"
-msgstr ""
+msgstr "HTMLエディタ変換サブテスト"
 
 #. module: html_editor
 #: model:ir.model,name:html_editor.model_html_editor_converter_test
 msgid "Html Editor Converter Test"
-msgstr ""
+msgstr "HTMLエディター変換ツールテスト"
 
 #. module: html_editor
 #: model:ir.model.fields,field_description:html_editor.field_html_editor_converter_test_sub__id
@@ -952,7 +947,7 @@ msgstr "画像"
 #. odoo-javascript
 #: code:addons/html_editor/static/src/main/link/link_popover.js:0
 msgid "Indicates the link is sponsored or paid content"
-msgstr ""
+msgstr "リンクがスポンサー提供または有料コンテンツであることを示します"
 
 #. module: html_editor
 #. odoo-javascript
@@ -1042,7 +1037,7 @@ msgstr "画像またはアイコンを挿入"
 #. odoo-javascript
 #: code:addons/html_editor/static/src/main/media/media_plugin.js:0
 msgid "Insert image, icon or video"
-msgstr ""
+msgstr "画像、アイコン、または動画を挿入"
 
 #. module: html_editor
 #. odoo-javascript
@@ -1105,6 +1100,12 @@ msgstr "リンク"
 
 #. module: html_editor
 #. odoo-javascript
+#: code:addons/html_editor/static/src/main/link/link_popover.xml:0
+msgid "Link Popover"
+msgstr "リンク ポップオーバー"
+
+#. module: html_editor
+#. odoo-javascript
 #: code:addons/html_editor/static/src/main/link/link_popover.js:0
 msgid "Link copied to clipboard."
 msgstr "リンクはクリップボードにコピーされました。"
@@ -1153,7 +1154,7 @@ msgstr "ループ"
 #. odoo-javascript
 #: code:addons/html_editor/static/src/main/media/media_dialog/video_selector.xml:0
 msgid "MM:SS"
-msgstr ""
+msgstr "MM:SS"
 
 #. module: html_editor
 #. odoo-javascript
@@ -1184,6 +1185,12 @@ msgstr "中セクション見出し"
 #: code:addons/html_editor/static/src/others/embedded_components/core/file/readonly_file.js:0
 msgid "Missing File"
 msgstr "ファイルが見つかりません"
+
+#. module: html_editor
+#. odoo-javascript
+#: code:addons/html_editor/static/src/main/powerbox/powerbox_plugin.js:0
+msgid "Modules"
+msgstr "モジュール"
 
 #. module: html_editor
 #. odoo-javascript
@@ -1308,7 +1315,7 @@ msgstr "新しいタブで開く"
 #. odoo-javascript
 #: code:addons/html_editor/static/src/main/link/link_popover.xml:0
 msgid "Open in new tab"
-msgstr ""
+msgstr "新規タブで開く"
 
 #. module: html_editor
 #. odoo-javascript
@@ -1355,7 +1362,7 @@ msgstr "ポジションY"
 #. odoo-javascript
 #: code:addons/html_editor/static/src/main/link/link_popover.js:0
 msgid "Prevents the new page from accessing the original window (security)"
-msgstr ""
+msgstr "新しいページが元のウィンドウにアクセスするのを防止します(セキュリティ)"
 
 #. module: html_editor
 #. odoo-javascript
@@ -1523,7 +1530,7 @@ msgstr "カラムを削除"
 #. odoo-javascript
 #: code:addons/html_editor/static/src/main/link/link_popover.js:0
 msgid "Removes referrer information sent to the target site"
-msgstr ""
+msgstr "ターゲットサイトに送信されるリファラー情報を削除します"
 
 #. module: html_editor
 #. odoo-javascript
@@ -1662,7 +1669,7 @@ msgstr "画像を検索"
 #. odoo-javascript
 #: code:addons/html_editor/static/src/main/media/media_dialog/image_selector.xml:0
 msgid "Search the web for royalty-free images"
-msgstr ""
+msgstr "ロイヤリティフリーの画像をウェブで検索"
 
 #. module: html_editor
 #. odoo-javascript
@@ -1681,6 +1688,18 @@ msgstr "フォント色を選択"
 #: code:addons/html_editor/static/src/main/media/media_dialog/media_dialog.js:0
 msgid "Select a media"
 msgstr "メディアを選択"
+
+#. module: html_editor
+#. odoo-javascript
+#: code:addons/html_editor/static/src/main/link/link_popover.xml:0
+msgid "Select button shape"
+msgstr "ボタンの形状を選択"
+
+#. module: html_editor
+#. odoo-javascript
+#: code:addons/html_editor/static/src/main/link/link_popover.xml:0
+msgid "Select button size"
+msgstr "ボタンサイズを選択"
 
 #. module: html_editor
 #. odoo-javascript
@@ -1744,12 +1763,6 @@ msgstr "形を設定: サムネイル"
 
 #. module: html_editor
 #. odoo-javascript
-#: code:addons/html_editor/static/src/main/link/link_popover.xml:0
-msgid "Shape"
-msgstr "形状"
-
-#. module: html_editor
-#. odoo-javascript
 #: code:addons/html_editor/static/src/main/media/media_dialog/file_selector.xml:0
 msgid "Show optimized images"
 msgstr "最適化済画像を表示"
@@ -1760,18 +1773,17 @@ msgstr "最適化済画像を表示"
 msgid ""
 "Showing all differences between the current version and the selected one "
 "updated by"
-msgstr ""
+msgstr "現在のバージョンと、更新された選択バージョンとのすべての差異を表示します"
 
 #. module: html_editor
 #. odoo-javascript
 #: code:addons/html_editor/static/src/components/history_dialog/history_dialog.xml:0
 msgid "Showing the document as it was on"
-msgstr ""
+msgstr "ドキュメントを当時の状態で表示："
 
 #. module: html_editor
 #. odoo-javascript
 #: code:addons/html_editor/static/src/main/font/gradient_picker/gradient_picker.xml:0
-#: code:addons/html_editor/static/src/main/link/link_popover.xml:0
 msgid "Size"
 msgstr "サイズ"
 
@@ -1803,7 +1815,7 @@ msgstr "プロンプトが長すぎます。もっと短い言葉にして下さ
 #. odoo-javascript
 #: code:addons/html_editor/static/src/components/history_dialog/history_dialog.xml:0
 msgid "Split view"
-msgstr ""
+msgstr "分割表示"
 
 #. module: html_editor
 #. odoo-javascript
@@ -1815,7 +1827,7 @@ msgstr "星"
 #. odoo-javascript
 #: code:addons/html_editor/static/src/main/media/media_dialog/video_selector.js:0
 msgid "Start at"
-msgstr ""
+msgstr "開始"
 
 #. module: html_editor
 #. odoo-javascript
@@ -1897,8 +1909,8 @@ msgid ""
 "The document was already saved from someone with a different history for "
 "model \"%(model)s\", field \"%(field)s\" with id \"%(id)d\"."
 msgstr ""
-"ドキュメントはモデル\"%(model)s\", フィールド \"%(field)s\" 、id \"%(id)d\""
-"用に異なる履歴を持つ他の誰かによって既に保存されています。"
+"ドキュメントはモデル\"%(model)s\", フィールド \"%(field)s\" 、id \"%(id)d\"用"
+"に異なる履歴を持つ他の誰かによって既に保存されています。"
 
 #. module: html_editor
 #. odoo-javascript
@@ -2229,8 +2241,9 @@ msgstr "はい"
 msgid ""
 "You can not replace a field by this image. If you want to use this image, "
 "first save it on your computer and then upload it here."
-msgstr "この画像をフィールドに置き換えることはできません。この画像を使用したい場合は"
-"、まずコンピュータに保存してから、こちらにアップロードして下さい。"
+msgstr ""
+"この画像をフィールドに置き換えることはできません。この画像を使用したい場合"
+"は、まずコンピュータに保存してから、こちらにアップロードして下さい。"
 
 #. module: html_editor
 #. odoo-javascript
@@ -2355,6 +2368,12 @@ msgstr "px"
 
 #. module: html_editor
 #. odoo-javascript
+#: code:addons/html_editor/static/src/main/font/font_plugin.js:0
+msgid "title"
+msgstr ""
+
+#. module: html_editor
+#. odoo-javascript
 #: code:addons/html_editor/static/src/main/media/media_dialog/video_selector.xml:0
 msgid "videos"
 msgstr "動画"
@@ -2363,6 +2382,12 @@ msgstr "動画"
 #: model:ir.model,name:html_editor.model_ir_websocket
 msgid "websocket message handling"
 msgstr "WebSocketメッセージ処理"
+
+#~ msgid "Copy Link"
+#~ msgstr "リンクをコピー"
+
+#~ msgid "Shape"
+#~ msgstr "形状"
 
 #~ msgid "Hide Dailymotion logo"
 #~ msgstr "Dailymotionロゴを非表示"

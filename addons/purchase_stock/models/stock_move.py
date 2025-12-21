@@ -46,7 +46,7 @@ class StockMove(models.Model):
         super()._compute_description_picking()
         for move in self:
             if move.purchase_line_id:
-                seller = move.sudo().purchase_line_id.selected_seller_id
+                seller = move.purchase_line_id.sudo().selected_seller_id
                 vendor_reference = f'[{seller.product_code}]' if seller.product_code else ''
                 vendor_reference += f' {seller.product_name}' if seller.product_name else ''
                 no_variant_attributes = '\n'.join(f'{attribute.attribute_id.name}: {attribute.name}' for attribute in move.purchase_line_id.sudo().product_no_variant_attribute_value_ids)
@@ -174,6 +174,25 @@ class StockMove(models.Model):
 
         if aml_quantity <= 0:
             return valuation_data
+
+        other_candidates_qty = 0
+        for move in self.purchase_line_id.move_ids:
+            if move.product_id != self.product_id:
+                continue
+            if move.date > self.date or (move.date == self.date and move.id > self.id):
+                continue
+            if move.is_in or move.is_dropship:
+                other_candidates_qty += move._get_valued_qty()
+            elif move.is_out:
+                other_candidates_qty -= -move._get_valued_qty()
+
+        if self.product_uom.compare(aml_quantity, other_candidates_qty) <= 0:
+            return valuation_data
+
+        # Remove quantity from prior moves.
+        value = value * ((aml_quantity - other_candidates_qty) / aml_quantity)
+        aml_quantity = aml_quantity - other_candidates_qty
+
         if quantity >= aml_quantity:
             valuation_data['quantity'] = aml_quantity
             valuation_data['value'] = value

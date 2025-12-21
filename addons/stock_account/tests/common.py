@@ -257,6 +257,11 @@ class TestStockValuationCommon(BaseCommon):
             ('account_id', '=', self.account_stock_valuation.id),
         ], order='date, id')
 
+    def _get_stock_variation_move_lines(self):
+        return self.env['account.move.line'].search([
+            ('account_id', '=', self.account_stock_variation.id),
+        ], order='date, id')
+
     def _get_expense_move_lines(self):
         return self.env['account.move.line'].search([
             ('account_id', '=', self.account_expense.id),
@@ -280,6 +285,10 @@ class TestStockValuationCommon(BaseCommon):
         cls.stock_location = cls.warehouse.lot_stock_id
         cls.customer_location = cls.env.ref('stock.stock_location_customers')
         cls.supplier_location = cls.env.ref('stock.stock_location_suppliers')
+        cls.inventory_location = cls.env['stock.location'].search([
+            ('usage', '=', 'inventory'),
+            ('company_id', '=', cls.company.id)
+        ], limit=1)
 
         cls.account_expense = cls.company.expense_account_id
         cls.account_stock_valuation = cls.company.account_stock_valuation_id

@@ -30,6 +30,31 @@ describe("pos_store.js", () => {
         expect(json2str).toBe("json");
     });
 
+    test("connectNewData canceled order", async () => {
+        const store = await setupPosEnv();
+        const models = store.models;
+        const order = await getFilledOrder(store);
+        const serializedOrder = { ...order.raw };
+
+        await store.deleteOrders([order]);
+        serializedOrder.state = "cancel";
+        let isListenerCalled = false;
+        const listenerCleanup = models["pos.order"].addEventListener("update", (data) => {
+            if (data.id === order.id) {
+                const orderToRecompute = models["pos.order"].get(data.id);
+                orderToRecompute.triggerRecomputeAllPrices();
+                isListenerCalled = true;
+            }
+        });
+        models.connectNewData({
+            "pos.order": [serializedOrder],
+        });
+        const updatedOrder = models["pos.order"].get(order.id);
+        expect(updatedOrder.state).toBe("cancel");
+        expect(isListenerCalled).toBe(true);
+        listenerCleanup();
+    });
+
     describe("syncAllOrders", () => {
         test("simple sync", async () => {
             const store = await setupPosEnv();
@@ -466,11 +491,11 @@ describe("pos_store.js", () => {
             expect(order.amount_tax).toEqual(2.85);
             expect(order.lines[0].qty).toEqual(3);
             expect(order.lines[0].price_unit).toEqual(3);
-            expect(order.lines[0].price_subtotal).toEqual(3);
+            expect(order.lines[0].price_subtotal).toEqual(9);
             expect(order.lines[0].price_subtotal_incl).toEqual(10.35);
             expect(order.lines[1].qty).toEqual(2);
             expect(order.lines[1].price_unit).toEqual(3);
-            expect(order.lines[1].price_subtotal).toEqual(3);
+            expect(order.lines[1].price_subtotal).toEqual(6);
             expect(order.lines[1].price_subtotal_incl).toEqual(7.5);
 
             order.is_refund = true;
@@ -481,11 +506,11 @@ describe("pos_store.js", () => {
             expect(order.amount_tax).toEqual(-2.85);
             expect(order.lines[0].qty).toEqual(-3);
             expect(order.lines[0].price_unit).toEqual(3);
-            expect(order.lines[0].price_subtotal).toEqual(3);
+            expect(order.lines[0].price_subtotal).toEqual(9);
             expect(order.lines[0].price_subtotal_incl).toEqual(10.35);
             expect(order.lines[1].qty).toEqual(-2);
             expect(order.lines[1].price_unit).toEqual(3);
-            expect(order.lines[1].price_subtotal).toEqual(3);
+            expect(order.lines[1].price_subtotal).toEqual(6);
             expect(order.lines[1].price_subtotal_incl).toEqual(7.5);
         });
     });

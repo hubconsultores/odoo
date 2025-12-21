@@ -294,6 +294,10 @@ class ProductProduct(models.Model):
         self.ensure_one()
         return self.ids
 
+    def get_total_routes(self):
+        # Extend the total routes in other modules
+        return self.env['stock.route']
+
     def _get_description(self, picking_type_id):
         """
             Return product description based on the picking type:
@@ -874,7 +878,7 @@ class ProductTemplate(models.Model):
             else:
                 template.lot_sequence_id = self.env.ref('stock.sequence_production_lots', raise_if_not_found=False)
 
-    @api.depends('serial_prefix_format', 'lot_sequence_id')
+    @api.depends('lot_sequence_id.number_next_actual')
     def _compute_next_serial(self):
         for template in self:
             if template.lot_sequence_id:
