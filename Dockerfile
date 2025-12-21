@@ -1,15 +1,28 @@
 FROM odoo:19.0
 
-# Copiamos TU fork del core a /opt/odoo (sin tocar /usr/lib)
 USER root
-RUN mkdir -p /opt/odoo && chown -R odoo:odoo /opt/odoo
+
+# 1) Copiamos TU core (fork) a /opt/odoo
+#    (NO tocamos /usr/lib/python3/dist-packages/odoo)
+RUN mkdir -p /opt/odoo
+COPY . /opt/odoo
+
+# 2) Permisos (por si easypanel monta con uid distinto)
+RUN chown -R odoo:odoo /opt/odoo
+
+# 3) Creamos un odoo.conf “mínimo” (puedes sobreescribirlo con volumen si quieres)
+#    OJO: enterprise/extra-addons están en addons_path pero se montan como volumen desde Easypanel.
+RUN printf "%s\n" \
+"[options]" \
+"proxy_mode = True" \
+"data_dir = /var/lib/odoo" \
+"addons_path = /opt/odoo/odoo/addons,/mnt/enterprise,/mnt/extra-addons,/mnt/moduloshub" \
+"admin_passwd = ${ODOO_ADMIN_PASSWD:-admin}" \
+> /etc/odoo/odoo.conf && \
+chown odoo:odoo /etc/odoo/odoo.conf
 
 USER odoo
-COPY --chown=odoo:odoo . /opt/odoo
 
-# Importante: NO copiamos /enterprise ni /extra-addons aquí,
-# porque en Easypanel los tienes como VOLUMENES montados en /mnt/enterprise, etc.
-
-# Ejecutar el core desde tu fork
-# (usamos el odoo.conf del contenedor: /etc/odoo/odoo.conf)
-CMD ["python3", "/opt/odoo/odoo-bin", "-c", "/etc/odoo/odoo.conf"]
+# 4) MUY IMPORTANTE: ejecutamos SIEMPRE el odoo-bin de /opt/odoo
+#    Así no entra en juego el core “debian” de /usr/lib/...
+CMD ["/opt/odoo/odoo-bin", "-c", "/etc/odoo/odoo.conf"]
