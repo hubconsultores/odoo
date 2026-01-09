@@ -276,7 +276,7 @@ class PosOrder(models.Model):
     def _get_pos_anglo_saxon_price_unit(self, product, partner_id, quantity):
         moves = self.filtered(lambda o: o.partner_id.id == partner_id)\
             .mapped('picking_ids.move_ids')\
-            .filtered(lambda m: m.is_valued and m.product_id.valuation == 'real_time')\
+            .filtered(lambda m: m.is_valued and m.product_id.valuation == 'real_time' and m.product_id.id == product.id)\
             .sorted(lambda x: x.date)
         return moves._get_price_unit()
 
@@ -582,7 +582,7 @@ class PosOrder(models.Model):
                     raise UserError(_('The paid amount is different from the total amount of the order.'))
                 elif totally_paid_or_more > 0 and order.state == 'paid':
                     list_line.append(_("Warning, the paid amount is higher than the total amount. (Difference: %s)", formatLang(self.env, order.amount_paid - order.amount_total, currency_obj=order.currency_id)))
-                if order.nb_print > 0 and vals.get('payment_ids'):
+                if order.nb_print > 0 and any(command[0] in [0, 1] and command[2].get('payment_status') and command[2]['payment_status'] != 'cancelled' for command in vals.get('payment_ids')):
                     raise UserError(_('You cannot change the payment of a printed order.'))
 
         if len(list_line) > 0:
@@ -660,8 +660,11 @@ class PosOrder(models.Model):
         if self.refunded_order_id.exists():
             return _('%(refunded_order)s REFUND', refunded_order=self.refunded_order_id.name)
         else:
-            last_reference_part = self.pos_reference.split('-')[-1]
+            last_reference_part = self.get_reference_last_part()
             return f"{session.config_id.name} - {last_reference_part}"
+
+    def get_reference_last_part(self):
+        return self.pos_reference.split('-')[-1]
 
     def action_stock_picking(self):
         self.ensure_one()
@@ -976,7 +979,7 @@ class PosOrder(models.Model):
                         'display_type': 'rounding',
                     })
         # Stock.
-        if self.company_id.anglo_saxon_accounting and self.picking_ids.ids:
+        if self.company_id.inventory_valuation == 'real_time' and self.picking_ids.ids:
             stock_moves = self.env['stock.move'].sudo().search([
                 ('picking_id', 'in', self.picking_ids.ids),
                 ('product_id.valuation', '=', 'real_time'),
