@@ -35,6 +35,8 @@ class AccountPaymentRegister(models.TransientModel):
                     d = f_delta
                     f_previous = wizard.l10n_ar_net_amount
                     wizard.amount += d
+                    wizard.env.add_to_compute(wizard.l10n_ar_withholding_ids._fields['base_amount'], wizard.l10n_ar_withholding_ids)
+                    wizard.env.add_to_compute(wizard.l10n_ar_withholding_ids._fields['amount'], wizard.l10n_ar_withholding_ids)
                     wizard._compute_l10n_ar_net_amount()
                     for i in range(201):
                         f_delta = checks_amount - wizard.l10n_ar_net_amount
@@ -47,6 +49,8 @@ class AccountPaymentRegister(models.TransientModel):
                         d = max(f_delta / der, 0.01)
                         f_previous = wizard.l10n_ar_net_amount
                         wizard.amount += d
+                        wizard.env.add_to_compute(wizard.l10n_ar_withholding_ids._fields['base_amount'], wizard.l10n_ar_withholding_ids)
+                        wizard.env.add_to_compute(wizard.l10n_ar_withholding_ids._fields['amount'], wizard.l10n_ar_withholding_ids)
                         wizard._compute_l10n_ar_net_amount()
                     if i == 200:
                         # Adjustment failed, resetting
@@ -138,7 +142,8 @@ class AccountPaymentRegister(models.TransientModel):
                 '|', ('from_date', '>=', date), ('from_date', '=', False),
                 '|', ('to_date', '<=', date), ('to_date', '=', False),
                 ('partner_id', '=', wizard.partner_id.commercial_partner_id.id),
-                ('tax_id.l10n_ar_withholding_payment_type', '=', wizard.partner_type)
+                ('tax_id.l10n_ar_withholding_payment_type', '=', wizard.partner_type),
+                ('tax_id.active', '=', True)
             ])
             wizard.l10n_ar_withholding_ids = [Command.clear()] + [Command.create({'tax_id': x.tax_id.id}) for x in partner_taxes]
 

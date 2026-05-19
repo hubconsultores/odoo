@@ -53,9 +53,7 @@ patch(PosStore.prototype, {
 
         return order;
     },
-    setCashier(employee) {
-        super.setCashier(employee);
-
+    setCashierUpdateSession(employee) {
         if (this.config.module_pos_hr) {
             if (!this.data.network.offline) {
                 this.data.write("pos.session", [this.config.current_session_id.id], {
@@ -64,6 +62,13 @@ patch(PosStore.prototype, {
             } else {
                 this.employeeBuffer.push(employee);
             }
+        }
+    },
+    setCashier(employee) {
+        super.setCashier(employee);
+
+        if (this.config.module_pos_hr) {
+            this.setCashierUpdateSession(employee);
             const o = this.getOrder();
             if (o && !o.getOrderlines().length) {
                 // Order without lines can be considered to be un-owned by any employee.
@@ -74,6 +79,7 @@ patch(PosStore.prototype, {
                 this.numpadMode = "quantity";
             }
         }
+        return true;
     },
     addLineToCurrentOrder(vals, opt = {}, configure = true) {
         vals.employee_id = false;
@@ -139,11 +145,20 @@ patch(PosStore.prototype, {
     },
     async allowProductCreation() {
         if (this.config.module_pos_hr) {
-            return this.employeeIsAdmin;
+            return this.employeeIsAdmin && (await super.allowProductCreation());
         }
         return await super.allowProductCreation();
     },
     canEditPayment(order) {
         return super.canEditPayment(order) && (!this.config.module_pos_hr || this.employeeIsAdmin);
+    },
+    async handleUrlParams() {
+        if (this.config.module_pos_hr && !this.cashier) {
+            if (this.router.state.current !== "LoginScreen") {
+                this.router.navigate("LoginScreen", {});
+            }
+            return;
+        }
+        return await super.handleUrlParams(...arguments);
     },
 });

@@ -267,17 +267,23 @@ class HrLeave(models.Model):
                 leave.request_hour_to = hour_to
 
     @api.depends('employee_id', 'leave_type_request_unit', 'request_date_from', 'request_date_to',
-            'request_hour_from', 'request_hour_to', 'request_date_from_period', 'request_date_to_period')
+            'request_hour_from', 'request_hour_to', 'request_date_from_period', 'request_date_to_period', 'state')
     def _compute_dashboard_warning_message(self):
+        check_warning_leaves = self.filtered_domain([
+            ('state', 'not in', ('refuse', 'cancel')),
+            ('holiday_status_id.allow_request_on_top', '=', False),
+        ])
+        (self - check_warning_leaves).dashboard_warning_message = False
+        if not check_warning_leaves:
+            return
         all_leaves = self.search([
-            ('date_from', '<', max(self.mapped('date_to'))),
-            ('date_to', '>', min(self.mapped('date_from'))),
-            ('employee_id', 'in', self.employee_id.ids),
+            ('date_from', '<', max(check_warning_leaves.mapped('date_to'))),
+            ('date_to', '>', min(check_warning_leaves.mapped('date_from'))),
+            ('employee_id', 'in', check_warning_leaves.employee_id.ids),
             ('holiday_status_id.allow_request_on_top', '=', False),
             ('state', 'not in', ['cancel', 'refuse']),
         ])
-        self.filtered(lambda self: self.state in ['cancel', 'refuse']).dashboard_warning_message = False
-        for holiday in self.filtered(lambda self: self.state not in ['cancel', 'refuse']):
+        for holiday in check_warning_leaves:
             conflicting_holidays = all_leaves.filtered_domain([
                 ('employee_id', 'in', holiday.employee_id.ids),
                 ('date_from', '<', holiday.date_to),
@@ -732,11 +738,13 @@ Versions:
             holiday.attachment_ids = holiday.supported_attachment_ids
         self.invalidate_recordset(['attachment_ids'])
 
-    @api.constrains('date_from', 'date_to', 'employee_id')
+    @api.constrains('date_from', 'date_to', 'employee_id', 'state')
     def _check_date(self):
         if self.env.context.get('leave_skip_date_check', False):
             return
         for holiday in self:
+            if holiday.state in ('refuse', 'cancel'):
+                continue
             if holiday.dashboard_warning_message:
                 raise ValidationError(holiday.dashboard_warning_message)
 
@@ -910,9 +918,11 @@ Versions:
             if any(leave.state == 'cancel' for leave in self):
                 raise UserError(_('Only a manager can modify a canceled leave.'))
 
-        # Unlink existing resource.calendar.leaves for validated time off
-        if 'state' in values and values['state'] != 'validate':
-            validated_leaves = self.filtered(lambda l: l.state == 'validate')
+        # If a leave changes state from validated or if the dates of a validated leave change
+        # unlink the corresponding resource calendar leave
+        date_fields = {'date_from', 'date_to', 'request_date_from', 'request_date_to'}
+        validated_leaves = self.filtered(lambda l: l.state == 'validate')
+        if validated_leaves and (('state' in values and values['state'] != 'validate') or date_fields.intersection(values)):
             validated_leaves._remove_resource_leave()
 
         employee_id = values.get('employee_id', False)
@@ -1002,6 +1012,8 @@ Versions:
 
     def _remove_resource_leave(self):
         """ This method will create entry in resource calendar time off object at the time of holidays cancel/removed """
+        if self.has_access('write'):
+            return self.env['resource.calendar.leaves'].search([('holiday_id', 'in', self.ids)]).sudo().unlink()
         return self.env['resource.calendar.leaves'].search([('holiday_id', 'in', self.ids)]).unlink()
 
     def _validate_leave_request(self):
@@ -1048,13 +1060,18 @@ Versions:
                 "%(employee)s on Time Off : %(duration)s",
                 employee=holiday.employee_id.name or holiday.category_id.name,
                 duration=holiday.duration_display)
-            allday_value = not holiday.request_unit_half
+            allday_value = not holiday.request_unit_half or holiday.request_date_from_period == 'am' and holiday.request_date_to_period == 'pm'
             if holiday.leave_type_request_unit == 'hour':
                 allday_value = float_compare(holiday.number_of_days, 1.0, 1) >= 0
 
-            leave_tz = pytz.timezone(holiday.tz) if holiday.tz else pytz.UTC
-            start_value = pytz.UTC.localize(holiday.date_from).astimezone(leave_tz).replace(tzinfo=None)
-            stop_value = pytz.UTC.localize(holiday.date_to).astimezone(leave_tz).replace(tzinfo=None)
+            if allday_value:
+                # `start` and `stop` are not in UTC for allday events
+                leave_tz = pytz.timezone(holiday.tz) if holiday.tz else pytz.UTC
+                start_value = pytz.UTC.localize(holiday.date_from).astimezone(leave_tz).replace(tzinfo=None)
+                stop_value = pytz.UTC.localize(holiday.date_to).astimezone(leave_tz).replace(tzinfo=None)
+            else:
+                start_value = holiday.date_from
+                stop_value = holiday.date_to
 
             meeting_values = {
                 'name': meeting_name,
@@ -1452,6 +1469,8 @@ is approved, validated or refused.')
                 responsible = self.employee_id.leave_manager_id
             elif self.employee_id.parent_id.user_id:
                 responsible = self.employee_id.parent_id.user_id
+            elif self.holiday_status_id.responsible_ids:
+                responsible = self.holiday_status_id.responsible_ids
         elif self.validation_type == 'hr' or (self.validation_type == 'both' and self.state == 'validate1'):
             if self.holiday_status_id.responsible_ids:
                 responsible = self.holiday_status_id.responsible_ids

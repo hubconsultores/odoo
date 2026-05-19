@@ -82,7 +82,7 @@ class AccountMove(models.Model):
 
     def button_draft(self):
         # EXTENDS account
-        for move in self.filtered('l10n_tr_nilvera_uuid'):
+        for move in self.filtered(lambda move: move.l10n_tr_nilvera_uuid and move.move_type == 'out_invoice'):
             if move.l10n_tr_nilvera_send_status == 'error':
                 move.message_post(body=_("To preserve accounting integrity and comply with legal requirements, invoices cannot be reused once an error occurs. Please create a new invoice to continue."))
             elif move.l10n_tr_nilvera_send_status != 'not_sent':
@@ -221,11 +221,11 @@ class AccountMove(models.Model):
             self.env['ir.config_parameter'].sudo().set_param(param_key, last_fetched_date)
         return last_fetched_date
 
-    def _l10n_tr_nilvera_get_documents(self, invoice_channel="einvoice", document_category="Purchase", journal_type="in_invoice"):
+    def _l10n_tr_nilvera_get_documents(self, invoice_channel="einvoice", document_category="Purchase", journal_type="purchase"):
         with _get_nilvera_client(self.env.company) as client:
             endpoint = f"/{invoice_channel}/{quote(document_category)}"
             start_date = self._get_nilvera_last_fetch_date(invoice_channel, journal_type)
-            end_date = fields.Datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+            end_date = fields.Datetime.context_timestamp(self.with_context(tz='Europe/Istanbul'), fields.Datetime.now()).strftime("%Y-%m-%dT%H:%M:%S")
             page = 1
 
             # We filter documents by their CreatedDate on Nilvera, which represents when the document was created on

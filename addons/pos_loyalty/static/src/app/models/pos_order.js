@@ -997,10 +997,8 @@ patch(PosOrder.prototype, {
         }
         const taxKey = cheapestLine.tax_ids.map((t) => t.id);
         return {
-            discountable: cheapestLine.comboTotalPriceWithoutTax,
-            discountablePerTax: Object.fromEntries([
-                [taxKey, cheapestLine.comboTotalPriceWithoutTax],
-            ]),
+            discountable: cheapestLine.comboTotalBasePrice,
+            discountablePerTax: Object.fromEntries([[taxKey, cheapestLine.comboTotalBasePrice]]),
         };
     },
     /**
@@ -1360,15 +1358,19 @@ patch(PosOrder.prototype, {
             );
         }
     },
+    _getRewardedProduct(reward, args) {
+        return (
+            reward.reward_product_ids.find((p) => p.id === args["product"]?.id) ||
+            reward.reward_product_ids[0]
+        );
+    },
     /**
      * @param {Object} args See `_applyReward`
      * @returns {Array} List of values to create the reward lines
      */
     _getRewardLineValuesProduct(args) {
         const reward = args["reward"];
-        const product =
-            reward.reward_product_ids.find((p) => p.id === args["product"]?.id) ||
-            reward.reward_product_ids[0];
+        const product = this._getRewardedProduct(reward, args);
 
         const points = this._getRealCouponPoints(args["coupon_id"]);
         const unclaimedQty = this._computeUnclaimedFreeProductQty(

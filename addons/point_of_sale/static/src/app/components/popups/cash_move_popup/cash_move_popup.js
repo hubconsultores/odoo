@@ -64,10 +64,10 @@ export class CashMovePopup extends Component {
             "CASH_DRAWER_ACTION"
         );
         const order = this.pos.models["pos.order"].create({
-            session_id: this.session,
-            company_id: this.company,
+            session_id: this.pos.session,
+            company_id: this.pos.company,
             config_id: this.pos.config,
-            user_id: this.user,
+            user_id: this.pos.user,
             ticket_code: "",
             tracking_number: "",
             sequence_number: 0,
@@ -128,5 +128,8 @@ export class CashMovePopup extends Component {
         if (result) {
             this.state.amount = result;
         }
+    }
+    async cancel() {
+        this.props.close();
     }
 }

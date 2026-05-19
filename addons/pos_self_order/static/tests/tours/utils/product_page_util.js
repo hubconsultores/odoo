@@ -61,6 +61,20 @@ export function clickCancel() {
     ];
 }
 
+export function checkOrderTotal(amount) {
+    return {
+        content: `Confirm '${amount}' is displayed correctly`,
+        trigger: `.o_self_product_list_page .o_self_shadow_bottom .o-so-tabular-nums:contains('${amount}')`,
+    };
+}
+
+export function checkProductQty(productName, qty) {
+    return {
+        content: `Confirm product '${qty}' is displayed correctly`,
+        trigger: `.o_self_product_list_page .o_self_product_box:has(.self_order_product_name:contains('${productName}')) .badge:contains('${qty}')`,
+    };
+}
+
 export function clickDiscard() {
     return {
         content: "Click on Discard button",
@@ -183,5 +197,12 @@ export function checkProductOutOfStock(productName) {
     return {
         content: `Check if '${productName}' is marked as out of stock`,
         trigger: `.o_self_product_box:has(span:contains('${productName}')):has(div:contains('Out of stock'))`,
+    };
+}
+
+export function isShown() {
+    return {
+        content: "Check whether the Product List page is displayed",
+        trigger: ".o_self_product_list_page",
     };
 }
